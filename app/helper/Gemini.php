@@ -8,7 +8,9 @@ class Gemini {
         $this->apiKey = $_ENV['GEMINI_API_KEY'];
     }
 
-    public function generateContent($prompt) {
+    public function generateContent($rating, $filters) {
+        $prompt = $this->createPrompt($rating, $filters);
+
         $data = [
             'contents' => [
                 ['parts' => [['text' => $prompt]]]
@@ -34,5 +36,24 @@ class Gemini {
         } else {
             return 'Unable to generate content. Please try again.';
         }
+    }
+
+    private function createPrompt($rating, $filters) {
+        $prompt = "Generate a movie review with a rating of $rating. ";
+
+        if (isset($filters['word_count'])) {
+            $prompt .= "The review should be around " . $filters['word_count'] . " words. ";
+        }
+        if (isset($filters['humor_level'])) {
+            $prompt .= "The humor level should be " . $filters['humor_level'] . "/10. ";
+        }
+        if (isset($filters['critic_level'])) {
+            $prompt .= "The critic level should be " . $filters['critic_level'] . "/10. ";
+        }
+        if (isset($filters['style'])) {
+            $prompt .= "The style should be " . $filters['style'] . ". ";
+        }
+
+        return $prompt;
     }
 }
