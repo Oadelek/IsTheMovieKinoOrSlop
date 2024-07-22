@@ -27,7 +27,7 @@ class ReviewController extends Controller {
                 'movie_id' => $movie_id,
                 'rating' => trim($_POST['rating']),
                 'content' => '',
-                'ai_generated' => isset($_POST['ai_generated']) ? tru : false
+                'ai_generated' => isset($_POST['ai_generated']) ? true : false
             ];
 
             $gemini = new Gemini();
