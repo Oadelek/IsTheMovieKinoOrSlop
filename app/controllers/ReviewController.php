@@ -14,16 +14,20 @@ class ReviewController extends Controller {
             exit();
         }
 
+        if ($this->reviewModel->hasUserReviewed($_SESSION['user_id'], $movie_id)) {
+            // Set a session variable to indicate that the user has already reviewed the movie
+            $_SESSION['already_reviewed'] = true;
+            header('location: /movie/details/' . $movie_id . '#reviews');
+            exit();
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $movie = $this->movieModel->getMovie($movie_id); // Fetch the movie details
-            $movieTitle = $movie['title']; // Get the movie title
-            
             $data = [
                 'user_id' => $_SESSION['user_id'],
                 'movie_id' => $movie_id,
                 'rating' => trim($_POST['rating']),
                 'content' => '',
-                'ai_generated' => true
+                'ai_generated' => isset($_POST['ai_generated']) ? tru : false
             ];
 
             $gemini = new Gemini();
@@ -34,7 +38,10 @@ class ReviewController extends Controller {
                 'style' => $_POST['style']
             ];
 
-            $data['content'] = $gemini->generateReview($data['rating'], $filters, $movieTitle);
+            $movie = $this->movieModel->getMovie($movie_id);
+            $movieTitle = $movie['title'];
+
+            $data['content'] = $gemini->generateReview($data['rating'], $movieTitle, $filters);
 
             // Instead of saving directly, pass to a preview page
             $this->view('layouts/PrivateHeaderView');
@@ -58,9 +65,9 @@ class ReviewController extends Controller {
                 'movie_id' => $_POST['movie_id'],
                 'rating' => $_POST['rating'],
                 'content' => $_POST['content'],
-                'ai_generated' => isset($_POST['ai_generated']) ? true : false
+                'ai_generated' => isset($_POST['ai_generated']) ? 1 : 0
             ];
-    
+
             if ($this->reviewModel->addReview($data)) {
                 header('location: /movie/details/' . $data['movie_id'] . '#reviews');
             } else {

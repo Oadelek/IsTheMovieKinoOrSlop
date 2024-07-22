@@ -10,7 +10,8 @@
         </div>
 
         <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="ai_generated" name="ai_generated" checked>
+            <input type="hidden" name="ai_generated" value="0">
+            <input type="checkbox" class="form-check-input" id="ai_generated" name="ai_generated" value="1" <?php echo $data['ai_generated'] ? 'checked' : ''; ?>>
             <label class="form-check-label" for="ai_generated">Mark as AI-generated</label>
         </div>
 

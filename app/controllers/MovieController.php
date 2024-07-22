@@ -1,9 +1,11 @@
 <?php
 class MovieController extends Controller {
     private $movieModel;
+    private $reviewModel;
 
     public function __construct() {
         $this->movieModel = $this->model('MovieModel');
+        $this->reviewModel = $this->model('ReviewModel');
     }
 
     public function index() {
@@ -39,20 +41,15 @@ class MovieController extends Controller {
 
     public function details($id) {
         $movie = $this->movieModel->getMovie($id);
-        $reviews = $this->model('ReviewModel')->getReviews($id);
+        $reviews = $this->reviewModel->getReviews($id); // Remove any LIMIT clause
+        $canReview = !$this->reviewModel->hasUserReviewed($_SESSION['user_id'] ?? null, $id);
+
         $data = [
             'movie' => $movie,
-            'reviews' => $reviews
+            'reviews' => $reviews,
+            'canReview' => $canReview
         ];
 
-        if (isset($_SESSION['user_id'])) {
-            $logModel = $this->model('LogModel');
-            $logModel->addLog([
-                'user_id' => $_SESSION['user_id'],
-                'movie_id' => $id
-            ]);
-        }
-        
         $this->view('layouts/PublicHeaderView');
         $this->view('movies/DetailsView', $data);
         $this->view('layouts/FooterView');

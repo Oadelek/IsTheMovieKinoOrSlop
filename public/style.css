@@ -25,6 +25,7 @@ header nav ul li a {
 
 main {
   padding: 20px;
+  padding-bottom: 60px; /* Adjust this value to add space for the footer */
 }
 
 footer {
@@ -32,9 +33,9 @@ footer {
   color: white;
   text-align: center;
   padding: 10px 0;
-  position: fixed;
+  position: relative; /* Change from fixed to relative */
   width: 100%;
-  bottom: 0;
+  margin-top: 20px; /* Optional: Add some margin-top for better spacing */
 }
 
 .slider {
@@ -73,7 +74,6 @@ footer {
   height: auto;
 }
 
-
 body {
   font-family: 'Roboto', sans-serif;
   background-color: #f8f9fa;
@@ -105,4 +105,55 @@ body {
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 0.8em;
+}
+
+.viewing-history, .user-reviews {
+  min-height: 200px;
+}
+
+:root {
+  --primary-color: #7B68EE;
+  --secondary-color: #9370DB;
+  --accent-color: #BA55D3;
+  --background-color: #F0F8FF;
+  --text-color: #483D8B;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  margin-top: auto;
 }

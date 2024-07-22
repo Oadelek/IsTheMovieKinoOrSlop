@@ -10,11 +10,11 @@ class ReviewModel {
         $sql = "INSERT INTO reviews (user_id, movie_id, rating, content, ai_generated) VALUES (:user_id, :movie_id, :rating, :content, :ai_generated)";
         $stmt = $this->db->prepare($sql);
 
-        $stmt->bindParam(':user_id', $data['user_id']);
-        $stmt->bindParam(':movie_id', $data['movie_id']);
+        $stmt->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':movie_id', $data['movie_id'], PDO::PARAM_INT);
         $stmt->bindParam(':rating', $data['rating']);
         $stmt->bindParam(':content', $data['content']);
-        $stmt->bindParam(':ai_generated', $data['ai_generated']);
+        $stmt->bindParam(':ai_generated', $data['ai_generated'], PDO::PARAM_INT);
 
         if($stmt->execute()) {
             return true;
@@ -61,6 +61,16 @@ class ReviewModel {
         $stmt->bindParam(':content', $data['content']);
         $stmt->bindParam(':ai_generated', $data['ai_generated'], PDO::PARAM_BOOL);
         return $stmt->execute();
+    }
+
+    public function hasUserReviewed($userId, $movieId) {
+        $sql = "SELECT COUNT(*) FROM reviews WHERE user_id = :user_id AND movie_id = :movie_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':movie_id', $movieId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() > 0;
     }
 }
 

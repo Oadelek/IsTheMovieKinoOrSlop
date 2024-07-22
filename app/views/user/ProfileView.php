@@ -43,12 +43,12 @@
                     <input type="number" class="form-control" id="word_count" name="word_count" value="<?php echo $data['aiSettings']['word_count']; ?>">
                 </div>
                 <div class="mb-3">
-                    <label for="humor_level" class="form-label">Humor Level</label>
-                    <input type="range" class="form-range" id="humor_level" name="humor_level" min="1" max="10" value="<?php echo $data['aiSettings']['humor_level']; ?>">
+                    <label for="humor_level" class="form-label">Humor Level: <span id="humorValue"><?php echo $data['aiSettings']['humor_level']; ?></span></label>
+                    <input type="range" class="form-range" id="humor_level" name="humor_level" min="1" max="10" value="<?php echo $data['aiSettings']['humor_level']; ?>" oninput="document.getElementById('humorValue').textContent=this.value">
                 </div>
                 <div class="mb-3">
-                    <label for="critic_level" class="form-label">Critic Level</label>
-                    <input type="range" class="form-range" id="critic_level" name="critic_level" min="1" max="10" value="<?php echo $data['aiSettings']['critic_level']; ?>">
+                    <label for="critic_level" class="form-label">Critic Level: <span id="criticValue"><?php echo $data['aiSettings']['critic_level']; ?></span></label>
+                    <input type="range" class="form-range" id="critic_level" name="critic_level" min="1" max="10" value="<?php echo $data['aiSettings']['critic_level']; ?>" oninput="document.getElementById('criticValue').textContent=this.value">
                 </div>
                 <div class="mb-3">
                     <label for="style" class="form-label">Style</label>

@@ -55,7 +55,7 @@ class Gemini {
     }
 
     private function createPrompt($rating, $movieTitle, $filters) {
-        $prompt = "Generate a movie review for '$movieTitle' with a rating of $rating/10. ";
+        $prompt = "Generate a movie review for the movie titled \"" . addslashes($movieTitle) . "\" with a rating of $rating/10. ";
         if (isset($filters['word_count'])) {
             $prompt .= "The review should be around " . $filters['word_count'] . " words. ";
         }

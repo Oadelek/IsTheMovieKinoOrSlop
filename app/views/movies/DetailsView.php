@@ -15,6 +15,13 @@
         </div>
     </div>
 
+    <?php if (isset($_SESSION['already_reviewed']) && $_SESSION['already_reviewed'] == true): ?>
+        <div class="alert alert-info" role="alert">
+            You have already reviewed this movie.
+        </div>
+        <?php unset($_SESSION['already_reviewed']); // Clear the message after showing it ?>
+    <?php endif; ?>
+
     <h2 class="mt-4">Reviews</h2>
     <div id="reviews">
         <?php if (isset($data['reviews'])): ?>
@@ -32,7 +39,9 @@
         <?php endif; ?>
     </div>
 
-    <?php if (isset($_SESSION['user_id'])): ?>
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        <p>Please <a href="/auth/login">log in</a> to add a review.</p>
+    <?php else: ?>
         <a href="/review/create/<?php echo $data['movie']['id']; ?>" class="btn btn-primary mt-3">Add a Review</a>
     <?php endif; ?>
 </main>
