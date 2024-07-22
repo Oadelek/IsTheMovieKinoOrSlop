@@ -1,46 +1,61 @@
 <?php
-
 class Gemini {
     private $apiKey;
-    private $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+    private $baseUrl;
 
     public function __construct() {
-        $this->apiKey = $_ENV['GEMINI_API_KEY'];
+        $this->apiKey = getenv('GOOGLE_API_KEY');
+        $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $this->apiKey;
     }
 
-    public function generateReview($rating, $filters) {
-        $prompt = $this->createPrompt($rating, $filters);
-
+    public function generateReview($rating, $movieTitle, $filters) {
+        $prompt = $this->createPrompt($rating, $movieTitle, $filters);
         $data = [
             'contents' => [
-                ['parts' => [['text' => $prompt]]]
+                [
+                    'parts' => [
+                        [
+                            'text' => $prompt
+                        ]
+                    ]
+                ]
             ]
         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->baseUrl . '?key=' . $this->apiKey);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
-        ]);
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => json_encode($data)
+            ]
+        ];
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $context = stream_context_create($options);
+        $result = file_get_contents($this->baseUrl, false, $context);
 
-        $result = json_decode($response, true);
+        if ($result === FALSE) {
+            error_log("Error fetching content from Gemini API");
+            return 'Unable to generate content. Please try again.';
+        }
 
-        if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-            return $result['candidates'][0]['content']['parts'][0]['text'];
+        $response = json_decode($result, true);
+
+        // Debugging: Log the API response (remove or comment out this line in production)
+        error_log('API Response: ' . print_r($response, true));
+
+        // Check for errors and return an appropriate message
+        if (isset($response['error'])) {
+            return "Error generating content: " . $response['error']['message'];
+        }
+        if (isset($response['candidates'][0]['content']['parts'][0]['text'])) {
+            return $response['candidates'][0]['content']['parts'][0]['text'];
         } else {
             return 'Unable to generate content. Please try again.';
         }
     }
 
-    private function createPrompt($rating, $filters) {
-        $prompt = "Generate a movie review with a rating of $rating. ";
-
+    private function createPrompt($rating, $movieTitle, $filters) {
+        $prompt = "Generate a movie review for '$movieTitle' with a rating of $rating/10. ";
         if (isset($filters['word_count'])) {
             $prompt .= "The review should be around " . $filters['word_count'] . " words. ";
         }
@@ -53,7 +68,6 @@ class Gemini {
         if (isset($filters['style'])) {
             $prompt .= "The style should be " . $filters['style'] . ". ";
         }
-
         return $prompt;
     }
 }
