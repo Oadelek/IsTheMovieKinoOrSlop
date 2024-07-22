@@ -169,6 +169,46 @@ class MovieModel {
         return $movies;
     }
 
+    public function getMovieDetails($id) {
+        $sql = "SELECT m.*, GROUP_CONCAT(DISTINCT g.name) as genres, GROUP_CONCAT(DISTINCT a.name) as actors
+                FROM movies m
+                LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+                LEFT JOIN genres g ON mg.genre_id = g.id
+                LEFT JOIN movie_actors ma ON m.id = ma.movie_id
+                LEFT JOIN actors a ON ma.actor_id = a.id
+                WHERE m.id = :id
+                GROUP BY m.id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getRecommendedMovies($userId, $limit = 10) {
+        // This is a simple recommendation system based on genres the user has watched
+        $sql = "SELECT DISTINCT m.*
+                FROM movies m
+                JOIN movie_genres mg ON m.id = mg.movie_id
+                JOIN genres g ON mg.genre_id = g.id
+                WHERE g.id IN (
+                    SELECT DISTINCT mg2.genre_id
+                    FROM user_viewing_history uvh
+                    JOIN movie_genres mg2 ON uvh.movie_id = mg2.movie_id
+                    WHERE uvh.user_id = :user_id
+                )
+                AND m.id NOT IN (
+                    SELECT movie_id FROM user_viewing_history WHERE user_id = :user_id
+                )
+                ORDER BY RAND()
+                LIMIT :limit";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     
 }
+
+

@@ -20,10 +20,14 @@ class LogModel {
         }
     }
 
-    public function getLog($user_id) {
-        $sql = "SELECT * FROM user_viewing_history WHERE user_id = :user_id";
+    public function getLog($userId) {
+        $sql = "SELECT uvh.*, m.title, m.year, m.poster 
+                FROM user_viewing_history uvh
+                JOIN movies m ON uvh.movie_id = m.id
+                WHERE uvh.user_id = :user_id
+                ORDER BY uvh.viewed_at DESC";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
