@@ -10,7 +10,7 @@
         <nav>
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="/movies/search">Search Movies</a></li>
+                <li><a href="/movie/index">Search Movies</a></li>
                 <li><a href="/auth/logout">Logout</a></li>
             </ul>
         </nav>

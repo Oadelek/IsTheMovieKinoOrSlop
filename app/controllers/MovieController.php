@@ -6,10 +6,14 @@ class MovieController extends Controller {
         $this->movieModel = $this->model('MovieModel');
     }
 
-    public function search() {
+    public function index() {
         $this->view('layouts/PublicHeaderView');
         $this->view('movies/SearchView');
         $this->view('layouts/FooterView');
+    }
+
+    public function search() {
+        
     }
 
     public function details($id) {
