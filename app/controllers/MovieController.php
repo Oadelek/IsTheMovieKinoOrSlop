@@ -13,7 +13,18 @@ class MovieController extends Controller {
     }
 
     public function search() {
-        
+        if (isset($_GET['query'])) {
+            $query = $_GET['query'];
+            $movies = $this->movieModel->searchMovies($query);
+            $data = [
+                'movies' => $movies
+            ];
+            $this->view('layouts/PublicHeaderView');
+            $this->view('movies/SearchView', $data);
+            $this->view('layouts/FooterView');
+        } else {
+            $this->index(); // Redirect to the search page if no query
+        }
     }
 
     public function details($id) {

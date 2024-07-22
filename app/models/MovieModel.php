@@ -1,9 +1,11 @@
 <?php
 class MovieModel {
     private $db;
+    private $omdb;
 
     public function __construct() {
         $this->db = db_connect();
+        $this->omdb = new OMDB();
     }
 
     public function getMovies() {
@@ -47,7 +49,7 @@ class MovieModel {
         $stmt->execute();
         $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Optional: fetch additional movie details from OMDB API
+        //fetch additional movie details from OMDB API
         foreach ($movies as &$movie) {
             $omdbData = $this->omdb->getMovieDetails($movie['title']);
             if (isset($omdbData['Title'])) {
