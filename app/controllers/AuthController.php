@@ -65,4 +65,33 @@ class AuthController extends Controller {
         session_destroy();
         header('location: /');
     }
+
+    public function profile() {
+        if (!isset($_SESSION['user_id'])) {
+            header('location: /auth/login');
+            exit();
+        }
+
+        $userModel = $this->model('UserModel');
+        $logModel = $this->model('LogModel');
+        $reviewModel = $this->model('ReviewModel');
+
+        $user = $userModel->getUserById($_SESSION['user_id']);
+        $viewingHistory = $logModel->getLog($_SESSION['user_id']);
+        $watchlist = $userModel->getWatchlist($_SESSION['user_id']);
+        $reviews = $reviewModel->getUserReviews($_SESSION['user_id']);
+        $aiSettings = $userModel->getAISettings($_SESSION['user_id']);
+
+        $data = [
+            'user' => $user,
+            'viewingHistory' => $viewingHistory,
+            'watchlist' => $watchlist,
+            'reviews' => $reviews,
+            'aiSettings' => $aiSettings
+        ];
+
+        $this->view('layouts/PrivateHeaderView');
+        $this->view('user/ProfileView', $data);
+        $this->view('layouts/FooterView');
+    }
 }
