@@ -7,15 +7,16 @@ class HomeController extends Controller {
     }
 
     public function index() {
-        $genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Romance']; 
+        // Get genres and movies
+        $genres = $this->movieModel->getGenres();
         $data = [];
-
         foreach ($genres as $genre) {
-            $data[$genre] = $this->movieModel->getMoviesByGenre($genre, 10); // Limit to 10 movies per genre
+            $data['genres'][$genre['name']] = $this->movieModel->getMoviesByGenre($genre['id']);
         }
 
+        // Render the views
         $this->view('layouts/PublicHeaderView');
-        $this->view('movies/HomeView', $data); // Pass genre data to HomeView
+        $this->view('movies/HomeView', $data);
         $this->view('layouts/FooterView');
     }
 }
