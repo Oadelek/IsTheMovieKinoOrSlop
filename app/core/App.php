@@ -7,12 +7,16 @@ class App {
     public function __construct() {
         $url = $this->parseUrl();
 
-        if(file_exists('../controllers/' . $url[0] . '.php')) {
-            $this->controller = $url[0];
-            unset($url[0]);
+        // Check if $url is not null and has at least one element
+        if ($url !== null && !empty($url[0])) {
+            $controllerName = ucwords($url[0]) . 'Controller';
+            if(file_exists('app/controllers/' . $controllerName . '.php')) {
+                $this->controller = $controllerName;
+                unset($url[0]);
+            }
         }
 
-        require_once '../controllers/' . $this->controller . '.php';
+        require_once 'app/controllers/' . $this->controller . '.php';
         $this->controller = new $this->controller;
 
         if(isset($url[1])) {
@@ -23,7 +27,6 @@ class App {
         }
 
         $this->params = $url ? array_values($url) : [];
-
         call_user_func_array([$this->controller, $this->method], $this->params);
     }
 
@@ -31,5 +34,6 @@ class App {
         if(isset($_GET['url'])) {
             return explode('/', filter_var(rtrim($_GET['url'], '/'), FILTER_SANITIZE_URL));
         }
+        return null;  // Explicitly return null if $_GET['url'] is not set
     }
 }
