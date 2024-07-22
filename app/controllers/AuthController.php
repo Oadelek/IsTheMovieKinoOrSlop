@@ -1,4 +1,5 @@
 <?php
+
 class AuthController extends Controller {
     private $userModel;
 
@@ -7,11 +8,15 @@ class AuthController extends Controller {
     }
 
     public function login() {
+        $data = [
+            'username' => '',
+            'password' => '',
+            'error' => ''
+        ];
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $data = [
-                'username' => trim($_POST['username']),
-                'password' => trim($_POST['password'])
-            ];
+            $data['username'] = trim($_POST['username']);
+            $data['password'] = trim($_POST['password']);
 
             $user = $this->userModel->login($data['username'], $data['password']);
 
@@ -22,38 +27,37 @@ class AuthController extends Controller {
                 header('location: /');
             } else {
                 $data['error'] = 'Invalid username or password';
-                $this->view('layouts/PublicHeaderView');
-                $this->view('auth/LoginView', $data);
-                $this->view('layouts/FooterView');
             }
-        } else {
-            $this->view('layouts/PublicHeaderView');
-            $this->view('auth/LoginView');
-            $this->view('layouts/FooterView');
         }
+
+        $this->view('layouts/PublicHeaderView', $data);
+        $this->view('auth/LoginView', $data);
+        $this->view('layouts/FooterView');
     }
 
     public function register() {
+        $data = [
+            'username' => '',
+            'email' => '',
+            'password' => '',
+            'error' => ''
+        ];
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $data = [
-                'username' => trim($_POST['username']),
-                'email' => trim($_POST['email']),
-                'password' => trim($_POST['password'])
-            ];
+            $data['username'] = trim($_POST['username']);
+            $data['email'] = trim($_POST['email']);
+            $data['password'] = trim($_POST['password']);
 
             if ($this->userModel->register($data)) {
                 header('location: /auth/login');
             } else {
-                $data['error'] = 'Error registering user';
-                $this->view('layouts/PublicHeaderView');
-                $this->view('auth/RegisterView', $data);
-                $this->view('layouts/FooterView');
+                $data['error'] = 'Error registering user. Username might already exist or password does not meet the requirements.';
             }
-        } else {
-            $this->view('layouts/PublicHeaderView');
-            $this->view('auth/RegisterView');
-            $this->view('layouts/FooterView');
         }
+
+        $this->view('layouts/PublicHeaderView', $data);
+        $this->view('auth/RegisterView', $data);
+        $this->view('layouts/FooterView');
     }
 
     public function logout() {

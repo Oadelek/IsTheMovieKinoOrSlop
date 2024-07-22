@@ -1,4 +1,5 @@
 <main>
+    <h1>Welcome<?php if (isset($_SESSION['username'])) echo ', ' . htmlspecialchars($_SESSION['username']); ?>!</h1>
     <h1>Movies by Genre</h1>
 
     <?php if (isset($data['genres'])): ?>

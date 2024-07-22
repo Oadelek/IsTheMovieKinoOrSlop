@@ -9,11 +9,13 @@ class UserModel {
 
     public function register($data) {
         if ($this->getUserByUsername($data['username'])) {
-            return "Username already exists";
+            error_log("Username already exists");
+            return false;
         }
 
         if (!$this->validatePassword($data['password'])) {
-            return "Password does not meet the minimum security requirements";
+            error_log("Password does not meet the minimum security requirements");
+            return false ;
         }
 
         $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
@@ -23,7 +25,7 @@ class UserModel {
         $stmt->bindParam(':email', $data['email']);
         $stmt->bindParam(':password', password_hash($data['password'], PASSWORD_DEFAULT));
 
-        return $stmt->execute() ? true : false;
+        return $stmt->execute();
     }
 
     public function login($username, $password) {
@@ -33,7 +35,12 @@ class UserModel {
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return ($user && password_verify($password, $user['password'])) ? $user : false;
+        if ($user && password_verify($password, $user['password'])) {
+            return $user;
+        } else {
+            error_log("Invalid login attempt for username: " . $username);
+            return false;
+        }
     }
 
     public function getUserByUsername($username) {
