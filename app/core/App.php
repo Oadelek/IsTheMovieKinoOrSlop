@@ -26,10 +26,12 @@ class App {
             }
         }
 
+        $this->params = $url ? array_values($url) : [];
+
         // Add GET parameters to the params array
         $this->params = array_merge($this->params, $_GET);
 
-       // error_log("Controller: " . $this->controller . ", Method: " . $this->method);
+        //error_log("Controller: " . $this->controller . ", Method: " . $this->method);
         error_log("Params: " . print_r($this->params, true));
 
         call_user_func_array([$this->controller, $this->method], $this->params);

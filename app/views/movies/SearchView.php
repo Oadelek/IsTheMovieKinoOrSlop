@@ -9,7 +9,7 @@
             <?php foreach ($data['movies'] as $movie): ?>
                 <li>
                     <a href="/movie/details/<?php echo htmlspecialchars($movie['id']); ?>">
-                        <?php echo htmlspecialchars($movie['title']); ?> (<?php echo htmlspecialchars($movie['year']); ?>)
+                        <?php echo htmlspecialchars($movie['title']); ?>
                     </a>
                     <?php if (isset($movie['omdb_data'])): ?>
                         <p>Director: <?php echo htmlspecialchars($movie['omdb_data']['Director']); ?></p>

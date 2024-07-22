@@ -76,6 +76,7 @@ class MovieModel {
             $omdbData = $this->omdb->getMovieDetails($query);
 
             if (isset($omdbData['Title'])) {
+                
                 // Check if movie already exists
                 $sql = "SELECT * FROM movies WHERE imdb_id = :imdb_id";
                 $stmt = $this->db->prepare($sql);
@@ -84,17 +85,27 @@ class MovieModel {
                 $existingMovie = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$existingMovie) {
+                    // Prepare the year data
+                    $year = isset($omdbData['Year']) ? intval(substr($omdbData['Year'], 0, 4)) : null;
+
                     // Insert movie into the database
                     $sql = "INSERT INTO movies (imdb_id, title, year, director, plot, poster) 
                             VALUES (:imdb_id, :title, :year, :director, :plot, :poster)";
                     $stmt = $this->db->prepare($sql);
                     $stmt->bindValue(':imdb_id', $omdbData['imdbID']);
-                    $stmt->bindValue(':title', $omdbData['Title']);
-                    $stmt->bindValue(':year', $omdbData['Year']);
-                    $stmt->bindValue(':director', $omdbData['Director']);
+                    $stmt->bindValue(':title', substr($omdbData['Title'], 0, 255));
+                    $stmt->bindValue(':year', $year, PDO::PARAM_INT);
+                    $stmt->bindValue(':director', substr($omdbData['Director'], 0, 100));
                     $stmt->bindValue(':plot', $omdbData['Plot']);
-                    $stmt->bindValue(':poster', $omdbData['Poster']);
-                    $stmt->execute();
+                    $stmt->bindValue(':poster', substr($omdbData['Poster'], 0, 255));
+                    
+                    try {
+                        $stmt->execute();
+                    } catch (PDOException $e) {
+                        error_log("Database error: " . $e->getMessage());
+                        error_log("OMDB Data: " . print_r($omdbData, true));
+                        return [];
+                    }
 
                     // Retrieve inserted movie ID
                     $movieId = $this->db->lastInsertId();
