@@ -3,8 +3,7 @@ class MovieModel {
     private $db;
 
     public function __construct() {
-        $this->db = new Database();
-        $this->db = $this->db->connect();
+        $this->db = db_connect();
     }
 
     public function getMovies() {
