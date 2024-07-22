@@ -8,7 +8,7 @@ class Gemini {
         $this->apiKey = $_ENV['GEMINI_API_KEY'];
     }
 
-    public function generateContent($rating, $filters) {
+    public function generateReview($rating, $filters) {
         $prompt = $this->createPrompt($rating, $filters);
 
         $data = [
