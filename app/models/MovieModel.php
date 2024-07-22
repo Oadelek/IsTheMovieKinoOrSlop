@@ -23,28 +23,24 @@ class MovieModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getMoviesByGenre($genre, $limit = 10) {
-        // Get genre ID
-        $sql = "SELECT id FROM genres WHERE name = :genre";
+    public function getGenres() {
+        $sql = "SELECT * FROM genres";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':genre', $genre);
         $stmt->execute();
-        $genreId = $stmt->fetchColumn();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-        if ($genreId) {
-            // Get movies by genre
-            $sql = "SELECT movies.* FROM movies
-                    JOIN movie_genres ON movies.id = movie_genres.movie_id
-                    WHERE movie_genres.genre_id = :genre_id
-                    LIMIT :limit";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':genre_id', $genreId, PDO::PARAM_INT);
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        return [];
+    public function getMoviesByGenre($genreId) {
+        $sql = "
+            SELECT m.* 
+            FROM movies m
+            JOIN movie_genres mg ON m.id = mg.movie_id
+            WHERE mg.genre_id = :genre_id
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':genre_id', $genreId);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function addMovie($data) {
