@@ -12,19 +12,29 @@ class MovieController extends Controller {
         $this->view('layouts/FooterView');
     }
 
-    public function search() {
-        if (isset($_GET['query'])) {
+    public function search($query = null) {
+        error_log("Entering search method"); // Debug output
+        if ($query === null && isset($_GET['query'])) {
             $query = $_GET['query'];
+        }
+
+        if ($query) {
+            error_log("Query found: " . $query); // Debug output
             $movies = $this->movieModel->searchMovies($query);
             $data = [
-                'movies' => $movies
+                'movies' => $movies,
+                'query' => $query
             ];
-            $this->view('layouts/PublicHeaderView');
-            $this->view('movies/SearchView', $data);
-            $this->view('layouts/FooterView');
         } else {
-            $this->index(); // Redirect to the search page if no query
+            error_log("No query found"); // Debug output
+            $data = [
+                'query' => ''
+            ];
         }
+
+        $this->view('layouts/PublicHeaderView');
+        $this->view('movies/SearchView', $data);
+        $this->view('layouts/FooterView');
     }
 
     public function details($id) {

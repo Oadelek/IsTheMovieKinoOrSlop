@@ -4,7 +4,7 @@ class OMDB {
     private $baseUrl = 'http://www.omdbapi.com/';
 
     public function __construct() {
-        $this->apiKey = $_ENV['OMDB_API_KEY'];
+        $this->apiKey = $_ENV['OMDB_KEY'];
     }
 
     public function getMovieDetails($title) {

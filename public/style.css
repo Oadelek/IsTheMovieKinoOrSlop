@@ -54,3 +54,21 @@ footer {
   max-width: 100%;
   height: auto;
 }
+
+.movie-slider {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px 0;
+}
+
+.movie-item {
+  display: inline-block;
+  margin-right: 10px;
+  width: 200px;
+}
+
+.movie-item img {
+  width: 100%;
+  height: auto;
+}
