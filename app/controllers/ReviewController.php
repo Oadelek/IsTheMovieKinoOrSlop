@@ -36,15 +36,10 @@ class ReviewController extends Controller {
 
             $data['content'] = $gemini->generateReview($data['rating'], $filters, $movieTitle);
 
-            if ($this->reviewModel->addReview($data)) {
-                header('location: /movies/details/' . $movie_id);
-                exit();
-            } else {
-                $data['error'] = 'Error creating review';
-                $this->view('layouts/PrivateHeaderView');
-                $this->view('review/CreateReviewView', $data);
-                $this->view('layouts/FooterView');
-            }
+            // Instead of saving directly, pass to a preview page
+            $this->view('layouts/PrivateHeaderView');
+            $this->view('review/PreviewReviewView', $data);
+            $this->view('layouts/FooterView');
         } else {
             $data = [
                 'movie_id' => $movie_id,
@@ -53,6 +48,24 @@ class ReviewController extends Controller {
             $this->view('layouts/PrivateHeaderView');
             $this->view('review/CreateReviewView', $data);
             $this->view('layouts/FooterView');
+        }
+    }
+
+    public function submitReview() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $data = [
+                'user_id' => $_SESSION['user_id'],
+                'movie_id' => $_POST['movie_id'],
+                'rating' => $_POST['rating'],
+                'content' => $_POST['content'],
+                'ai_generated' => isset($_POST['ai_generated']) ? true : false
+            ];
+    
+            if ($this->reviewModel->addReview($data)) {
+                header('location: /movie/details/' . $data['movie_id'] . '#reviews');
+            } else {
+                // error handling
+            }
         }
     }
 }
