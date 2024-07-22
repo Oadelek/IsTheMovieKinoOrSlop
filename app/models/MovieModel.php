@@ -23,6 +23,30 @@ class MovieModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getMoviesByGenre($genre, $limit = 10) {
+        // Get genre ID
+        $sql = "SELECT id FROM genres WHERE name = :genre";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':genre', $genre);
+        $stmt->execute();
+        $genreId = $stmt->fetchColumn();
+
+        if ($genreId) {
+            // Get movies by genre
+            $sql = "SELECT movies.* FROM movies
+                    JOIN movie_genres ON movies.id = movie_genres.movie_id
+                    WHERE movie_genres.genre_id = :genre_id
+                    LIMIT :limit";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':genre_id', $genreId, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        return [];
+    }
+
     public function addMovie($data) {
         $sql = "INSERT INTO movies (imdb_id, title, year, director, plot, poster) VALUES (:imdb_id, :title, :year, :director, :plot, :poster)";
         $stmt = $this->db->prepare($sql);
@@ -40,38 +64,6 @@ class MovieModel {
             return false;
         }
     }
-
-    public function searchMovies($query) {
-        // Search OMDB API directly
-        $omdbData = $this->omdb->getMovieDetails($query);
-
-        if (isset($omdbData['Title'])) {
-            // Format OMDB results
-            $movies = [
-                [
-                    'id' => null, 
-                    'title' => $omdbData['Title'],
-                    'year' => $omdbData['Year'],
-                    'director' => $omdbData['Director'],
-                    'plot' => $omdbData['Plot'],
-                    'poster' => $omdbData['Poster'],
-                    'omdb_data' => $omdbData
-                ]
-            ];
-            return $movies;
-        }
-
-        // If no results from OMDB, search the local database
-        $sql = "SELECT * FROM movies WHERE title LIKE :query";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':query', '%' . $query . '%');
-        $stmt->execute();
-        $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $movies;
-    }
-
-
 
     public function searchMovies($query) {
         $movies = [];
